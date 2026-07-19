@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class StudentController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */
@@ -18,8 +20,8 @@ class StudentController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('nis', 'like', "%{$search}%")
-                  ->orWhere('nama', 'like', "%{$search}%")
-                  ->orWhere('kelas', 'like', "%{$search}%");
+                    ->orWhere('nama', 'like', "%{$search}%")
+                    ->orWhere('kelas', 'like', "%{$search}%");
             });
         }
 
@@ -43,7 +45,7 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $this->authorize('manage-students');
-        
+
         $validated = $request->validate([
             'nis' => 'required|unique:students,nis|max:20',
             'nama' => 'required|max:255',
@@ -88,7 +90,7 @@ class StudentController extends Controller
     public function update(Request $request, Student $student)
     {
         $this->authorize('manage-students');
-        
+
         $validated = $request->validate([
             'nis' => 'required|max:20|unique:students,nis,' . $student->id,
             'nama' => 'required|max:255',
@@ -111,7 +113,7 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         $this->authorize('manage-students');
-        
+
         $student->delete();
 
         return redirect()->route('students.index')
